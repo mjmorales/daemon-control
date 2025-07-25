@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjmorales/mac-daemon-control/internal/config"
+	"github.com/mjmorales/daemon-control/internal/config"
 )
 
 func TestNewGenerator(t *testing.T) {

@@ -1,12 +1,12 @@
 # daemon-control
 
-[![CI](https://github.com/mjmorales/mac-daemon-control/actions/workflows/ci.yml/badge.svg)](https://github.com/mjmorales/mac-daemon-control/actions/workflows/ci.yml)
-[![Release](https://github.com/mjmorales/mac-daemon-control/actions/workflows/release.yml/badge.svg)](https://github.com/mjmorales/mac-daemon-control/actions/workflows/release.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/mjmorales/mac-daemon-control)](https://goreportcard.com/report/github.com/mjmorales/mac-daemon-control)
-[![codecov](https://codecov.io/gh/mjmorales/mac-daemon-control/branch/main/graph/badge.svg)](https://codecov.io/gh/mjmorales/mac-daemon-control)
+[![CI](https://github.com/mjmorales/daemon-control/actions/workflows/ci.yml/badge.svg)](https://github.com/mjmorales/daemon-control/actions/workflows/ci.yml)
+[![Release](https://github.com/mjmorales/daemon-control/actions/workflows/release.yml/badge.svg)](https://github.com/mjmorales/daemon-control/actions/workflows/release.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mjmorales/daemon-control)](https://goreportcard.com/report/github.com/mjmorales/daemon-control)
+[![codecov](https://codecov.io/gh/mjmorales/daemon-control/branch/main/graph/badge.svg)](https://codecov.io/gh/mjmorales/daemon-control)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/mjmorales/mac-daemon-control)](https://go.dev/)
-[![Latest Release](https://img.shields.io/github/release/mjmorales/mac-daemon-control.svg)](https://github.com/mjmorales/mac-daemon-control/releases/latest)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/mjmorales/daemon-control)](https://go.dev/)
+[![Latest Release](https://img.shields.io/github/release/mjmorales/daemon-control.svg)](https://github.com/mjmorales/daemon-control/releases/latest)
 
 A powerful and generic daemon control tool for managing macOS LaunchAgent daemons. Simplify the creation, installation, and management of background services on macOS.
 
@@ -25,19 +25,19 @@ A powerful and generic daemon control tool for managing macOS LaunchAgent daemon
 
 ### Download Pre-built Binary
 
-Download the latest release from the [releases page](https://github.com/mjmorales/mac-daemon-control/releases).
+Download the latest release from the [releases page](https://github.com/mjmorales/daemon-control/releases).
 
 ```bash
 # Download and extract (example for macOS arm64)
-curl -L https://github.com/mjmorales/mac-daemon-control/releases/latest/download/daemon-control_Darwin_arm64.tar.gz | tar xz
+curl -L https://github.com/mjmorales/daemon-control/releases/latest/download/daemon-control_Darwin_arm64.tar.gz | tar xz
 sudo mv daemon-control /usr/local/bin/
 ```
 
 ### Build from Source
 
 ```bash
-git clone https://github.com/mjmorales/mac-daemon-control.git
-cd mac-daemon-control
+git clone https://github.com/mjmorales/daemon-control.git
+cd daemon-control
 make build
 sudo make install
 ```
@@ -203,6 +203,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📮 Support
 
-- Report bugs via [GitHub Issues](https://github.com/mjmorales/mac-daemon-control/issues)
-- Request features via [GitHub Issues](https://github.com/mjmorales/mac-daemon-control/issues)
-- Ask questions in [GitHub Discussions](https://github.com/mjmorales/mac-daemon-control/discussions)
+- Report bugs via [GitHub Issues](https://github.com/mjmorales/daemon-control/issues)
+- Request features via [GitHub Issues](https://github.com/mjmorales/daemon-control/issues)
+- Ask questions in [GitHub Discussions](https://github.com/mjmorales/daemon-control/discussions)

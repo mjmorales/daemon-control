@@ -1,6 +1,6 @@
 package main
 
-import "github.com/mjmorales/mac-daemon-control/cmd"
+import "github.com/mjmorales/daemon-control/cmd"
 
 func main() {
 	cmd.Execute()

@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/mjmorales/mac-daemon-control/internal/core"
+	"github.com/mjmorales/daemon-control/internal/core"
 )
 
 // configCmd represents the config command

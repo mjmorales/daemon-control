@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/mjmorales/mac-daemon-control/internal/utils"
+	"github.com/mjmorales/daemon-control/internal/utils"
 )
 
 // tailCmd represents the tail command

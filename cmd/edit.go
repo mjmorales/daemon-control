@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/mjmorales/mac-daemon-control/internal/core"
+	"github.com/mjmorales/daemon-control/internal/core"
 )
 
 var (

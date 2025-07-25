@@ -44,7 +44,7 @@ golangci-lint run
 # Format code
 make fmt
 gofmt -w .
-goimports -local github.com/mjmorales/mac-daemon-control -w .
+goimports -local github.com/mjmorales/daemon-control -w .
 
 # Run go vet
 make vet
@@ -119,7 +119,7 @@ make deps-verify
 - The project uses golangci-lint v2.3.0 with custom exclusion rules in `.golangci.yml`
 - GoReleaser v2 configuration format
 - Repository URL: `https://github.com/mjmorales/daemon-control.git`
-- Package import path: `github.com/mjmorales/mac-daemon-control`
+- Package import path: `github.com/mjmorales/daemon-control`
 
 ## Testing Daemon Operations
 

@@ -26,7 +26,7 @@ linters:
   # - `fast`: enables only linters considered as "fast".
   # Default: standard
   default: none
-  
+
   # Enable specific linters.
   enable:
     - bodyclose
@@ -34,7 +34,7 @@ linters:
     - dupl
     - errcheck
     - exhaustive
-    - copyloopvar  # replaces exportloopref in newer versions
+    - copyloopvar # replaces exportloopref in newer versions
     - funlen
     - gochecknoinits
     - goconst
@@ -105,67 +105,67 @@ linters:
       - path: cmd/
         linters:
           - gochecknoinits
-      
+
       # Exclude gochecknoinits from utils (required for initialization)
       - path: internal/utils/utils.go
         linters:
           - gochecknoinits
-      
+
       # Exclude high cyclomatic complexity for complex functions
       - path: cmd/generate.go
         linters:
           - gocyclo
-      
+
       - path: internal/config/loader.go
         linters:
           - gocyclo
-      
+
       - path: internal/plist/generator.go
         linters:
           - gocyclo
-      
+
       # Exclude gosec subprocess warnings for legitimate use cases
       - path: cmd/edit.go
         linters:
           - gosec
         text: "G204:"
-      
+
       - path: cmd/tail.go
         linters:
           - gosec
         text: "G204:"
-      
+
       # Exclude gosec file inclusion warnings for config/plist operations
       - path: cmd/generate.go
         linters:
           - gosec
         text: "G304:"
-      
+
       - path: internal/utils/utils.go
         linters:
           - gosec
         text: "G304:"
-      
+
       # Exclude line length warnings for struct tags
       - path: internal/config/schema.go
         linters:
           - lll
-      
+
       # Exclude some linters from test files
       - path: _test\.go
         linters:
           - funlen
           - dupl
-      
+
       # Exclude funlen for complex but necessary functions
       - path: cmd/generate.go
         linters:
           - funlen
-      
+
       - path: internal/plist/generator.go
         linters:
           - funlen
-      
+
       # Exclude gosec file path warnings for logs command (legitimate use)
       - path: cmd/logs.go
         linters:
@@ -178,7 +178,7 @@ formatters:
   enable:
     - gofmt
     - goimports
-  
+
   # Formatters settings.
   settings:
     goimports:
@@ -186,14 +186,14 @@ formatters:
       # with the given prefixes are grouped after 3rd-party packages.
       # Default: []
       local-prefixes:
-        - github.com/mjmorales/mac-daemon-control
+        - github.com/mjmorales/daemon-control
 
 # Issues configuration.
 issues:
   # Maximum issues count per one linter.
   # Default: 50
   max-issues-per-linter: 0
-  
+
   # Maximum count of issues with the same text.
   # Default: 3
   max-same-issues: 0
