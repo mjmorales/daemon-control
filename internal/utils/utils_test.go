@@ -86,7 +86,7 @@ func TestGetPlistValue(t *testing.T) {
 </dict>
 </plist>`
 
-	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
+	err := os.WriteFile(plistPath, []byte(plistContent), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -137,7 +137,7 @@ func TestGetDaemonLabel(t *testing.T) {
 
 	plistContent := testPlistContent
 
-	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
+	err := os.WriteFile(plistPath, []byte(plistContent), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	plistPathWithoutExt := strings.TrimSuffix(plistPath, ".plist")
@@ -157,7 +157,7 @@ func TestCheckPlistExists(t *testing.T) {
 
 	// Create a test plist
 	plistPath := filepath.Join(tempDir, "existing-daemon.plist")
-	err := os.WriteFile(plistPath, []byte("test"), 0644)
+	err := os.WriteFile(plistPath, []byte("test"), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -214,7 +214,7 @@ func TestIsInstalled(t *testing.T) {
 	// Create a daemon plist
 	daemonPlistPath := filepath.Join(tempDaemonsDir, "test-daemon.plist")
 	plistContent := testPlistContent
-	err := os.WriteFile(daemonPlistPath, []byte(plistContent), 0644)
+	err := os.WriteFile(daemonPlistPath, []byte(plistContent), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	// Test not installed
@@ -224,7 +224,7 @@ func TestIsInstalled(t *testing.T) {
 
 	// Create installed plist
 	installedPlistPath := filepath.Join(tempLaunchAgentsDir, "com.example.test.plist")
-	err = os.WriteFile(installedPlistPath, []byte(plistContent), 0644)
+	err = os.WriteFile(installedPlistPath, []byte(plistContent), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	// Test installed
@@ -260,7 +260,7 @@ func TestIsRunning(t *testing.T) {
 	<string>com.example.test-not-running</string>
 </dict>
 </plist>`
-	err := os.WriteFile(daemonPlistPath, []byte(plistContent), 0644)
+	err := os.WriteFile(daemonPlistPath, []byte(plistContent), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	// Test with a daemon that's definitely not running
@@ -276,7 +276,7 @@ func TestCopyFile(t *testing.T) {
 	// Create source file
 	srcPath := filepath.Join(tempDir, "source.txt")
 	content := []byte("test content")
-	err := os.WriteFile(srcPath, content, 0644)
+	err := os.WriteFile(srcPath, content, 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	// Test successful copy
@@ -285,7 +285,7 @@ func TestCopyFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verify content
-	copiedContent, err := os.ReadFile(dstPath)
+	copiedContent, err := os.ReadFile(dstPath) // #nosec G304 - test file from known path
 	require.NoError(t, err)
 	assert.Equal(t, content, copiedContent)
 
@@ -332,7 +332,7 @@ func TestGetWorkingDirectory(t *testing.T) {
 </dict>
 </plist>`
 
-	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
+	err := os.WriteFile(plistPath, []byte(plistContent), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	plistPathWithoutExt := strings.TrimSuffix(plistPath, ".plist")
@@ -360,7 +360,7 @@ func TestGetStdoutPath(t *testing.T) {
 </dict>
 </plist>`
 
-	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
+	err := os.WriteFile(plistPath, []byte(plistContent), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	plistPathWithoutExt := strings.TrimSuffix(plistPath, ".plist")
@@ -388,7 +388,7 @@ func TestGetStderrPath(t *testing.T) {
 </dict>
 </plist>`
 
-	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
+	err := os.WriteFile(plistPath, []byte(plistContent), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	plistPathWithoutExt := strings.TrimSuffix(plistPath, ".plist")

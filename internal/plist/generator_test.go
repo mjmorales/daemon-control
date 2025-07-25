@@ -267,7 +267,7 @@ func TestGenerator_Generate(t *testing.T) {
 
 				// Read generated file
 				plistPath := filepath.Join(tempDir, tt.daemon.Name+".plist")
-				content, err := os.ReadFile(plistPath)
+				content, err := os.ReadFile(plistPath) // #nosec G304 - test file from known path
 				require.NoError(t, err)
 
 				// Validate content
