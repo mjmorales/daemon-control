@@ -9,7 +9,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/mjmorales/mac-daemon-control/internal/config"
+	"github.com/mjmorales/daemon-control/internal/config"
 )
 
 // Generator creates plist files from daemon configurations

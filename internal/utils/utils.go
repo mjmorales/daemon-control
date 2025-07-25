@@ -10,7 +10,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/mjmorales/mac-daemon-control/internal/core"
+	"github.com/mjmorales/daemon-control/internal/core"
 )
 
 // GetDaemonsDir returns the daemons directory from config

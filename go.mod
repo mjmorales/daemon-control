@@ -1,4 +1,4 @@
-module github.com/mjmorales/mac-daemon-control
+module github.com/mjmorales/daemon-control
 
 go 1.24.1
 
