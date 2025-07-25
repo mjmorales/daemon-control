@@ -56,3 +56,7 @@ daemon-control-*
 
 # Dependencies
 node_modules/
+
+# Test artifacts
+coverage.html
+coverage.out
