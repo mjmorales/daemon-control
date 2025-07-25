@@ -1,6 +1,8 @@
 # .goreleaser.yml
 # Documentation: https://goreleaser.com/customization/
 
+version: 2
+
 project_name: daemon-control
 
 before:
@@ -26,18 +28,6 @@ builds:
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
       - -X main.builtBy=goreleaser
-    # macOS specific build flags
-    overrides:
-      - goos: darwin
-        goarch: amd64
-        env:
-          - CC=o64-clang
-          - CXX=o64-clang++
-      - goos: darwin
-        goarch: arm64
-        env:
-          - CC=oa64-clang
-          - CXX=oa64-clang++
 
 archives:
   - id: daemon-control
@@ -63,6 +53,7 @@ checksum:
 
 signs:
   - artifacts: checksum
+    cmd: gpg
     args:
       - "--batch"
       - "--local-user"
@@ -71,8 +62,6 @@ signs:
       - "${signature}"
       - "--detach-sign"
       - "${artifact}"
-    cmd: gpg
-    signature: "${artifact}.sig"
 
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
@@ -134,10 +123,6 @@ release:
   draft: false
   prerelease: auto
   name_template: "{{.ProjectName}} v{{.Version}}"
-  header: |
-    ## daemon-control v{{.Version}}
-    
-    macOS daemon management tool for LaunchAgents.
 
 # Homebrew tap configuration
 brews:
@@ -162,15 +147,6 @@ brews:
     install: |
       bin.install "daemon-control"
 
-# Announce releases
-announce:
-  skip: "{{ gt .Patch 0 }}"
-  twitter:
-    enabled: false
-  discord:
-    enabled: false
-  slack:
-    enabled: false
 
 # SBOM generation
 sboms:
