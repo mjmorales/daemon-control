@@ -7,21 +7,38 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rs/zerolog"
+	"github.com/mjmorales/mac-daemon-control/internal/core"
 	"github.com/rs/zerolog/log"
 )
 
-// Paths
+// GetDaemonsDir returns the daemons directory from config
+func GetDaemonsDir() string {
+	config := core.GetManager().GetConfig()
+	if config != nil && config.DaemonsDir != "" {
+		return config.DaemonsDir
+	}
+	return filepath.Join(getScriptDir(), "daemons")
+}
+
+// GetLaunchAgentsDir returns the LaunchAgents directory from config
+func GetLaunchAgentsDir() string {
+	config := core.GetManager().GetConfig()
+	if config != nil && config.LaunchAgentsDir != "" {
+		return config.LaunchAgentsDir
+	}
+	return filepath.Join(os.Getenv("HOME"), "Library", "LaunchAgents")
+}
+
+// Legacy path variables for backward compatibility
 var (
 	ScriptDir       = getScriptDir()
-	DaemonsDir      = filepath.Join(ScriptDir, "daemons")
-	LaunchAgentsDir = filepath.Join(os.Getenv("HOME"), "Library", "LaunchAgents")
+	DaemonsDir      = GetDaemonsDir()
+	LaunchAgentsDir = GetLaunchAgentsDir()
 )
 
 func init() {
-	// Configure zerolog for pretty console output
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	// Let core config manager handle log configuration
+	// It will be initialized when first accessed
 }
 
 func getScriptDir() string {

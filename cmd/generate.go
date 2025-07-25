@@ -5,7 +5,9 @@ import (
 	"path/filepath"
 
 	"github.com/mjmorales/mac-daemon-control/internal/config"
+	"github.com/mjmorales/mac-daemon-control/internal/core"
 	"github.com/mjmorales/mac-daemon-control/internal/plist"
+	"github.com/mjmorales/mac-daemon-control/internal/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -34,13 +36,32 @@ and generates corresponding plist files that can be used with launchd.`,
 func init() {
 	rootCmd.AddCommand(generateCmd)
 	
-	generateCmd.Flags().StringVarP(&configFile, "config", "c", "", "Configuration file path (default: ./daemons.yaml)")
-	generateCmd.Flags().StringVarP(&outputDir, "output", "o", "out", "Output directory for generated plist files")
+	generateCmd.Flags().StringVarP(&configFile, "config", "c", "", "Configuration file path (default: from core config)")
+	generateCmd.Flags().StringVarP(&outputDir, "output", "o", "", "Output directory for generated plist files (default: from core config)")
 }
 
 func runGenerate() error {
-	// Load configuration
-	loader := config.NewLoader(configFile)
+	// Get core config
+	coreManager := core.GetManager()
+	coreConfig := coreManager.GetConfig()
+	
+	// Determine config file path
+	configPath := configFile
+	if configPath == "" {
+		configPath = coreManager.GetDaemonConfigPath()
+	}
+	
+	// Determine output directory
+	outDir := outputDir
+	if outDir == "" && coreConfig != nil {
+		outDir = coreConfig.OutputDir
+	}
+	if outDir == "" {
+		outDir = "out"
+	}
+	
+	// Load daemon configuration
+	loader := config.NewLoader(configPath)
 	cfg, err := loader.Load()
 	if err != nil {
 		return err
@@ -53,11 +74,11 @@ func runGenerate() error {
 	
 	log.Info().
 		Int("count", len(cfg.Daemons)).
-		Str("output", outputDir).
+		Str("output", outDir).
 		Msg("Generating plist files")
 	
 	// Create generator
-	generator := plist.NewGenerator(outputDir)
+	generator := plist.NewGenerator(outDir)
 	
 	// Generate plist files
 	if err := generator.GenerateAll(cfg.Daemons); err != nil {
@@ -66,39 +87,60 @@ func runGenerate() error {
 	
 	log.Info().
 		Int("count", len(cfg.Daemons)).
-		Str("directory", outputDir).
+		Str("directory", outDir).
 		Msg("Successfully generated plist files")
 	
-	// Also update the daemons directory if it exists
-	if _, err := os.Stat("daemons"); err == nil {
-		log.Info().Msg("Updating daemons directory...")
-		for _, daemon := range cfg.Daemons {
-			src := filepath.Join(outputDir, daemon.Name+".plist")
-			dst := filepath.Join("daemons", daemon.Name+".plist")
+	// Also update the daemons directory if configured
+	daemonsDir := utils.GetDaemonsDir()
+	if coreConfig != nil && coreConfig.AutoGeneratePlists {
+		if _, err := os.Stat(daemonsDir); err == nil {
+			log.Info().Msg("Updating daemons directory...")
 			
-			// Read the generated file
-			data, err := os.ReadFile(src)
-			if err != nil {
-				log.Error().
-					Err(err).
-					Str("daemon", daemon.Name).
-					Msg("Failed to read generated plist")
-				continue
+			// Backup existing plists if configured
+			if coreConfig.BackupOnGenerate {
+				backupDir := filepath.Join(daemonsDir, ".backup")
+				if err := os.MkdirAll(backupDir, 0755); err == nil {
+					// Copy existing plists to backup
+					files, _ := filepath.Glob(filepath.Join(daemonsDir, "*.plist"))
+					for _, file := range files {
+						base := filepath.Base(file)
+						dst := filepath.Join(backupDir, base+".bak")
+						data, _ := os.ReadFile(file)
+						os.WriteFile(dst, data, 0644)
+					}
+					log.Info().Str("dir", backupDir).Msg("Backed up existing plists")
+				}
 			}
 			
-			// Write to daemons directory
-			if err := os.WriteFile(dst, data, 0644); err != nil {
-				log.Error().
-					Err(err).
+			// Copy generated plists
+			for _, daemon := range cfg.Daemons {
+				src := filepath.Join(outDir, daemon.Name+".plist")
+				dst := filepath.Join(daemonsDir, daemon.Name+".plist")
+				
+				// Read the generated file
+				data, err := os.ReadFile(src)
+				if err != nil {
+					log.Error().
+						Err(err).
+						Str("daemon", daemon.Name).
+						Msg("Failed to read generated plist")
+					continue
+				}
+				
+				// Write to daemons directory
+				if err := os.WriteFile(dst, data, 0644); err != nil {
+					log.Error().
+						Err(err).
+						Str("daemon", daemon.Name).
+						Msg("Failed to copy plist to daemons directory")
+					continue
+				}
+				
+				log.Info().
 					Str("daemon", daemon.Name).
-					Msg("Failed to copy plist to daemons directory")
-				continue
+					Str("path", dst).
+					Msg("Copied plist to daemons directory")
 			}
-			
-			log.Info().
-				Str("daemon", daemon.Name).
-				Str("path", dst).
-				Msg("Copied plist to daemons directory")
 		}
 	}
 	
