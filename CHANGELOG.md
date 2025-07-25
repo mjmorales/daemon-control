@@ -1,3 +1,9 @@
+## [1.0.5](https://github.com/mjmorales/daemon-control/compare/v1.0.4...v1.0.5) (2025-07-25)
+
+### 🐛 Bug Fixes
+
+* add GPG key import step to release workflow ([5441940](https://github.com/mjmorales/daemon-control/commit/54419406fafda58061e4ffdcbf81ba9fbbd409b8))
+
 ## [1.0.4](https://github.com/mjmorales/daemon-control/compare/v1.0.3...v1.0.4) (2025-07-25)
 
 ### 🐛 Bug Fixes
