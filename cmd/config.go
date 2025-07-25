@@ -6,10 +6,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mjmorales/mac-daemon-control/internal/core"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
+
+	"github.com/mjmorales/mac-daemon-control/internal/core"
 )
 
 // configCmd represents the config command
@@ -45,20 +46,20 @@ var configShowCmd = &cobra.Command{
 			log.Error().Err(err).Msg("Failed to load configuration")
 			os.Exit(1)
 		}
-		
+
 		config := manager.GetConfig()
 		if config == nil {
 			log.Error().Msg("No configuration loaded")
 			os.Exit(1)
 		}
-		
+
 		// Marshal to YAML for display
 		data, err := yaml.Marshal(config)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to format configuration")
 			os.Exit(1)
 		}
-		
+
 		fmt.Println("Current configuration:")
 		fmt.Println("---------------------")
 		fmt.Print(string(data))
@@ -73,19 +74,19 @@ var configGetCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
-		
+
 		manager := core.NewManager()
 		if err := manager.Init(); err != nil {
 			log.Error().Err(err).Msg("Failed to load configuration")
 			os.Exit(1)
 		}
-		
+
 		value, err := manager.Get(key)
 		if err != nil {
 			log.Error().Err(err).Str("key", key).Msg("Failed to get configuration value")
 			os.Exit(1)
 		}
-		
+
 		// Format output based on type
 		switch v := value.(type) {
 		case string:
@@ -115,16 +116,16 @@ For map values (like custom_env_vars), use key.subkey format`,
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
 		value := args[1]
-		
+
 		manager := core.NewManager()
 		if err := manager.Init(); err != nil {
 			log.Error().Err(err).Msg("Failed to load configuration")
 			os.Exit(1)
 		}
-		
+
 		// Parse value based on key type
 		var parsedValue interface{}
-		
+
 		// Check if it's a boolean field
 		boolFields := []string{"auto_generate_plists", "backup_on_generate", "validate_plists", "use_system_launchd"}
 		isBoolField := false
@@ -134,7 +135,7 @@ For map values (like custom_env_vars), use key.subkey format`,
 				break
 			}
 		}
-		
+
 		if isBoolField {
 			// Parse boolean
 			switch strings.ToLower(value) {
@@ -156,7 +157,7 @@ For map values (like custom_env_vars), use key.subkey format`,
 				if !ok {
 					envVars = make(map[string]interface{})
 				}
-				
+
 				// Set the specific key
 				envVars[parts[1]] = value
 				key = "custom_env_vars"
@@ -166,12 +167,12 @@ For map values (like custom_env_vars), use key.subkey format`,
 			// Use string value as-is
 			parsedValue = value
 		}
-		
+
 		if err := manager.Set(key, parsedValue); err != nil {
 			log.Error().Err(err).Msg("Failed to set configuration value")
 			os.Exit(1)
 		}
-		
+
 		log.Info().Str("key", key).Interface("value", parsedValue).Msg("Configuration updated")
 	},
 }
@@ -184,13 +185,13 @@ var configListCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		keys := core.ValidKeys()
 		sort.Strings(keys)
-		
+
 		fmt.Println("Available configuration keys:")
 		fmt.Println("----------------------------")
 		for _, key := range keys {
 			fmt.Printf("  %s\n", key)
 		}
-		
+
 		fmt.Println("\nFor map values like custom_env_vars, use dot notation:")
 		fmt.Println("  custom_env_vars.KEY_NAME")
 	},
@@ -208,7 +209,7 @@ var configPathCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(configCmd)
-	
+
 	// Add subcommands
 	configCmd.AddCommand(configInitCmd)
 	configCmd.AddCommand(configShowCmd)

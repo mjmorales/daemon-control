@@ -28,19 +28,19 @@ func init() {
 
 func restartDaemon(daemonName string) error {
 	log.Info().Str("daemon", daemonName).Msg("Restarting daemon")
-	
+
 	// Stop the daemon
 	if err := stopDaemon(daemonName); err != nil {
 		return err
 	}
-	
+
 	// Wait a moment
 	time.Sleep(2 * time.Second)
-	
+
 	// Start the daemon
 	if err := startDaemon(daemonName); err != nil {
 		return err
 	}
-	
+
 	return nil
 }

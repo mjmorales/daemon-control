@@ -1,15 +1,17 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 
-	"github.com/mjmorales/mac-daemon-control/internal/core"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+
+	"github.com/mjmorales/mac-daemon-control/internal/core"
 )
 
 var (
@@ -34,14 +36,14 @@ or falls back to common editors based on your platform.`,
 
 func init() {
 	rootCmd.AddCommand(editCmd)
-	
+
 	editCmd.Flags().BoolVar(&editCore, "core", false, "Edit core configuration instead of daemon configuration")
 }
 
 func runEdit() error {
 	// Determine which config file to edit
 	var configPath string
-	
+
 	if editCore {
 		// Edit core config
 		configPath = core.ConfigPath()
@@ -50,11 +52,11 @@ func runEdit() error {
 		// Edit daemon config
 		manager := core.GetManager()
 		configPath = manager.GetDaemonConfigPath()
-		
+
 		// Check if file exists, create if not
 		if _, err := os.Stat(configPath); os.IsNotExist(err) {
 			log.Warn().Str("path", configPath).Msg("Daemon config not found, creating example")
-			
+
 			// Create a minimal example config
 			exampleConfig := `# Daemon configuration file
 # Define your daemons here
@@ -67,44 +69,45 @@ daemons:
   #   working_directory: /path/to/working/dir
   #   run_at_load: false
 `
-			if err := os.MkdirAll(filepath.Dir(configPath), 0755); err != nil {
+			if err := os.MkdirAll(filepath.Dir(configPath), 0750); err != nil {
 				return fmt.Errorf("failed to create config directory: %w", err)
 			}
-			
-			if err := os.WriteFile(configPath, []byte(exampleConfig), 0644); err != nil {
+
+			if err := os.WriteFile(configPath, []byte(exampleConfig), 0600); err != nil {
 				return fmt.Errorf("failed to create example config: %w", err)
 			}
 		}
-		
+
 		log.Info().Str("path", configPath).Msg("Opening daemon configuration")
 	}
-	
+
 	// Find editor
 	editor := findEditor()
 	if editor == "" {
 		return fmt.Errorf("no editor found. Please set EDITOR environment variable")
 	}
-	
+
 	log.Debug().Str("editor", editor).Str("file", configPath).Msg("Launching editor")
-	
-	// Launch editor
-	cmd := exec.Command(editor, configPath)
+
+	// Launch editor with context
+	ctx := context.Background()
+	cmd := exec.CommandContext(ctx, editor, configPath)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	
+
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("editor failed: %w", err)
 	}
-	
+
 	log.Info().Msg("Editor closed")
-	
+
 	// If editing daemon config, offer to generate plists
 	if !editCore {
 		fmt.Println("\nDaemon configuration edited.")
 		fmt.Println("Run 'daemon-control generate' to generate/update plist files.")
 	}
-	
+
 	return nil
 }
 
@@ -114,31 +117,31 @@ func findEditor() string {
 	if editor := os.Getenv("EDITOR"); editor != "" {
 		return editor
 	}
-	
+
 	// Check VISUAL environment variable
 	if visual := os.Getenv("VISUAL"); visual != "" {
 		return visual
 	}
-	
+
 	// Try common editors
 	editors := []string{
-		"nano",     // Simple and universally available
-		"vim",      // Vi improved
-		"vi",       // Basic vi
-		"emacs",    // Emacs
-		"code",     // VS Code
-		"subl",     // Sublime Text
-		"atom",     // Atom
-		"mate",     // TextMate
-		"bbedit",   // BBEdit
-		"nova",     // Nova
+		"nano",   // Simple and universally available
+		"vim",    // Vi improved
+		"vi",     // Basic vi
+		"emacs",  // Emacs
+		"code",   // VS Code
+		"subl",   // Sublime Text
+		"atom",   // Atom
+		"mate",   // TextMate
+		"bbedit", // BBEdit
+		"nova",   // Nova
 	}
-	
+
 	// On macOS, also try 'open' which uses the default app
 	if runtime.GOOS == "darwin" {
 		editors = append([]string{"open", "-t"}, editors...)
 	}
-	
+
 	// Find first available editor
 	for _, editor := range editors {
 		if _, err := exec.LookPath(editor); err == nil {
@@ -149,7 +152,7 @@ func findEditor() string {
 			return editor
 		}
 	}
-	
+
 	return ""
 }
 
@@ -168,7 +171,7 @@ var editDaemonCmd = &cobra.Command{
 }
 
 var editCoreCmd = &cobra.Command{
-	Use:   "edit-core",  
+	Use:   "edit-core",
 	Short: "Open core configuration in editor (alias for 'edit --core')",
 	Long:  `Open the core configuration file in your default editor.`,
 	Run: func(cmd *cobra.Command, args []string) {

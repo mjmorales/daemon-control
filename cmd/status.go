@@ -1,13 +1,15 @@
 package cmd
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"strings"
 
-	"github.com/mjmorales/mac-daemon-control/internal/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+
+	"github.com/mjmorales/mac-daemon-control/internal/utils"
 )
 
 // statusCmd represents the status command
@@ -32,40 +34,41 @@ func checkStatus(daemonName string) error {
 	if err := utils.CheckPlistExists(daemonName); err != nil {
 		return err
 	}
-	
+
 	plistPath := utils.GetPlistPath(daemonName)
 	label, err := utils.GetDaemonLabel(plistPath)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to read daemon label")
 		return err
 	}
-	
+
 	log.Info().Str("daemon", daemonName).Msg("Daemon status")
 	log.Info().Str("label", label).Msg("Label")
-	
+
 	installed, err := utils.IsInstalled(daemonName)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to check installation status")
 		return err
 	}
-	
+
 	if installed {
 		log.Info().Bool("installed", true).Msg("Installation status")
 	} else {
 		log.Warn().Bool("installed", false).Msg("Installation status")
 	}
-	
+
 	running, err := utils.IsRunning(daemonName)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to check running status")
 		return err
 	}
-	
+
 	if running {
 		log.Info().Bool("running", true).Msg("Running status")
-		
+
 		// Get process info
-		cmd := exec.Command("launchctl", "list")
+		ctx := context.Background()
+		cmd := exec.CommandContext(ctx, "launchctl", "list")
 		output, err := cmd.Output()
 		if err == nil {
 			lines := strings.Split(string(output), "\n")
@@ -79,12 +82,12 @@ func checkStatus(daemonName string) error {
 	} else {
 		log.Warn().Bool("running", false).Msg("Running status")
 	}
-	
+
 	// Show additional info from plist
 	workingDir, err := utils.GetWorkingDirectory(plistPath)
 	if err == nil && workingDir != "" {
 		log.Info().Str("working_directory", workingDir).Msg("Working directory")
 	}
-	
+
 	return nil
 }

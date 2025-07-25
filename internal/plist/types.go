@@ -22,13 +22,13 @@ func (d *Dict) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if err := e.EncodeToken(xml.StartElement{Name: xml.Name{Local: "dict"}}); err != nil {
 		return err
 	}
-	
+
 	for _, item := range d.Items {
 		if err := e.Encode(item); err != nil {
 			return err
 		}
 	}
-	
+
 	return e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "dict"}})
 }
 
@@ -114,13 +114,13 @@ func (a *Array) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if err := e.EncodeToken(xml.StartElement{Name: xml.Name{Local: "array"}}); err != nil {
 		return err
 	}
-	
+
 	for _, item := range a.Items {
 		if err := e.Encode(item); err != nil {
 			return err
 		}
 	}
-	
+
 	return e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "array"}})
 }
 
@@ -129,7 +129,7 @@ func (p *Plist) Validate() error {
 	if p.Dict == nil {
 		return fmt.Errorf("plist dict is nil")
 	}
-	
+
 	// Check for required Label key
 	hasLabel := false
 	for i := 0; i < len(p.Dict.Items); i += 2 {
@@ -138,10 +138,10 @@ func (p *Plist) Validate() error {
 			break
 		}
 	}
-	
+
 	if !hasLabel {
 		return fmt.Errorf("plist missing required Label key")
 	}
-	
+
 	return nil
 }

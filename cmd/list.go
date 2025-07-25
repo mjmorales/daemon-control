@@ -6,9 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mjmorales/mac-daemon-control/internal/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+
+	"github.com/mjmorales/mac-daemon-control/internal/utils"
 )
 
 // listCmd represents the list command

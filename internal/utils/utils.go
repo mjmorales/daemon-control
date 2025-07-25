@@ -1,14 +1,16 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
-	"github.com/mjmorales/mac-daemon-control/internal/core"
 	"github.com/rs/zerolog/log"
+
+	"github.com/mjmorales/mac-daemon-control/internal/core"
 )
 
 // GetDaemonsDir returns the daemons directory from config
@@ -56,7 +58,8 @@ func GetPlistPath(daemonName string) string {
 
 // GetPlistValue reads a value from a plist file using defaults command
 func GetPlistValue(plistPath, key string) (string, error) {
-	cmd := exec.Command("defaults", "read", plistPath, key)
+	ctx := context.Background()
+	cmd := exec.CommandContext(ctx, "defaults", "read", plistPath, key)
 	output, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -90,7 +93,7 @@ func CheckPlistExists(daemonName string) error {
 	if _, err := os.Stat(plistPath); os.IsNotExist(err) {
 		log.Error().Str("daemon", daemonName).Msg("Daemon not found")
 		log.Info().Msg("Available daemons:")
-		
+
 		files, _ := filepath.Glob(filepath.Join(DaemonsDir, "*.plist"))
 		for _, file := range files {
 			base := filepath.Base(file)
@@ -109,7 +112,7 @@ func IsInstalled(daemonName string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	
+
 	installedPath := filepath.Join(LaunchAgentsDir, label+".plist")
 	if _, err := os.Stat(installedPath); err == nil {
 		return true, nil
@@ -124,19 +127,21 @@ func IsRunning(daemonName string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	
-	cmd := exec.Command("launchctl", "list")
+
+	ctx := context.Background()
+	cmd := exec.CommandContext(ctx, "launchctl", "list")
 	output, err := cmd.Output()
 	if err != nil {
 		return false, err
 	}
-	
+
 	return strings.Contains(string(output), label), nil
 }
 
 // RunLaunchctl executes a launchctl command
 func RunLaunchctl(args ...string) error {
-	cmd := exec.Command("launchctl", args...)
+	ctx := context.Background()
+	cmd := exec.CommandContext(ctx, "launchctl", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
@@ -148,11 +153,11 @@ func CopyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	
-	err = os.WriteFile(dst, input, 0644)
+
+	err = os.WriteFile(dst, input, 0600)
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
