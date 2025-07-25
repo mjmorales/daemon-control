@@ -82,6 +82,23 @@ jobs:
         if: steps.semantic.outputs.new_release == 'true'
         uses: anchore/sbom-action/download-syft@v0
 
+      - name: Import GPG key
+        if: steps.semantic.outputs.new_release == 'true' && env.GPG_PRIVATE_KEY != '' && env.GPG_FINGERPRINT != ''
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
+        run: |
+          echo "Importing GPG key..."
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          
+          # Verify the key was imported and matches the expected fingerprint
+          gpg --list-secret-keys --keyid-format=long | grep -q "$GPG_FINGERPRINT" || {
+            echo "Error: Imported key fingerprint does not match expected fingerprint"
+            exit 1
+          }
+          
+          echo "GPG key imported successfully"
+
       - name: Run GoReleaser
         if: steps.semantic.outputs.new_release == 'true'
         uses: goreleaser/goreleaser-action@v6
