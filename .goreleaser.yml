@@ -38,9 +38,6 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    format_overrides:
-      - goos: windows
-        format: zip
     files:
       - README.md
       - LICENSE
@@ -64,7 +61,7 @@ signs:
       - "${artifact}"
 
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
@@ -127,7 +124,7 @@ release:
 # Homebrew tap configuration
 brews:
   - name: daemon-control
-    tap:
+    repository:
       owner: mjmorales
       name: homebrew-tap
       branch: main
