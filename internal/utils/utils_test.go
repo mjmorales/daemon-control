@@ -11,6 +11,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const testPlistContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.example.test</string>
+</dict>
+</plist>`
+
 func TestGetDaemonsDir(t *testing.T) {
 	// Test default behavior
 	dir := GetDaemonsDir()
@@ -65,7 +74,7 @@ func TestGetPlistValue(t *testing.T) {
 	// Create a test plist file
 	tempDir := t.TempDir()
 	plistPath := filepath.Join(tempDir, "test.plist")
-	
+
 	plistContent := `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -76,7 +85,7 @@ func TestGetPlistValue(t *testing.T) {
 	<string>/usr/local</string>
 </dict>
 </plist>`
-	
+
 	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
 	require.NoError(t, err)
 
@@ -105,7 +114,7 @@ func TestGetPlistValue(t *testing.T) {
 			// Remove .plist extension as defaults command doesn't want it
 			plistPathWithoutExt := strings.TrimSuffix(plistPath, ".plist")
 			value, err := GetPlistValue(plistPathWithoutExt, tt.key)
-			
+
 			if tt.wantError {
 				assert.Error(t, err)
 			} else {
@@ -125,16 +134,9 @@ func TestGetDaemonLabel(t *testing.T) {
 	// Create a test plist file
 	tempDir := t.TempDir()
 	plistPath := filepath.Join(tempDir, "test.plist")
-	
-	plistContent := `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>Label</key>
-	<string>com.example.test</string>
-</dict>
-</plist>`
-	
+
+	plistContent := testPlistContent
+
 	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
 	require.NoError(t, err)
 
@@ -147,7 +149,7 @@ func TestGetDaemonLabel(t *testing.T) {
 func TestCheckPlistExists(t *testing.T) {
 	// Create temp directory for daemons
 	tempDir := t.TempDir()
-	
+
 	// Override DaemonsDir for testing
 	oldDaemonsDir := DaemonsDir
 	DaemonsDir = tempDir
@@ -178,7 +180,7 @@ func TestCheckPlistExists(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := CheckPlistExists(tt.daemonName)
-			
+
 			if tt.wantError {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), "daemon not found")
@@ -198,7 +200,7 @@ func TestIsInstalled(t *testing.T) {
 	// Create temp directories
 	tempDaemonsDir := t.TempDir()
 	tempLaunchAgentsDir := t.TempDir()
-	
+
 	// Override directories for testing
 	oldDaemonsDir := DaemonsDir
 	oldLaunchAgentsDir := LaunchAgentsDir
@@ -211,14 +213,7 @@ func TestIsInstalled(t *testing.T) {
 
 	// Create a daemon plist
 	daemonPlistPath := filepath.Join(tempDaemonsDir, "test-daemon.plist")
-	plistContent := `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>Label</key>
-	<string>com.example.test</string>
-</dict>
-</plist>`
+	plistContent := testPlistContent
 	err := os.WriteFile(daemonPlistPath, []byte(plistContent), 0644)
 	require.NoError(t, err)
 
@@ -249,7 +244,7 @@ func TestIsRunning(t *testing.T) {
 
 	// Create temp directory
 	tempDir := t.TempDir()
-	
+
 	// Override DaemonsDir for testing
 	oldDaemonsDir := DaemonsDir
 	DaemonsDir = tempDir
@@ -277,7 +272,7 @@ func TestIsRunning(t *testing.T) {
 func TestCopyFile(t *testing.T) {
 	// Create temp directory
 	tempDir := t.TempDir()
-	
+
 	// Create source file
 	srcPath := filepath.Join(tempDir, "source.txt")
 	content := []byte("test content")
@@ -327,7 +322,7 @@ func TestGetWorkingDirectory(t *testing.T) {
 	// Create a test plist file
 	tempDir := t.TempDir()
 	plistPath := filepath.Join(tempDir, "test.plist")
-	
+
 	plistContent := `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -336,7 +331,7 @@ func TestGetWorkingDirectory(t *testing.T) {
 	<string>/usr/local/test</string>
 </dict>
 </plist>`
-	
+
 	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
 	require.NoError(t, err)
 
@@ -355,7 +350,7 @@ func TestGetStdoutPath(t *testing.T) {
 	// Create a test plist file
 	tempDir := t.TempDir()
 	plistPath := filepath.Join(tempDir, "test.plist")
-	
+
 	plistContent := `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -364,7 +359,7 @@ func TestGetStdoutPath(t *testing.T) {
 	<string>/var/log/test.out</string>
 </dict>
 </plist>`
-	
+
 	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
 	require.NoError(t, err)
 
@@ -383,7 +378,7 @@ func TestGetStderrPath(t *testing.T) {
 	// Create a test plist file
 	tempDir := t.TempDir()
 	plistPath := filepath.Join(tempDir, "test.plist")
-	
+
 	plistContent := `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -392,7 +387,7 @@ func TestGetStderrPath(t *testing.T) {
 	<string>/var/log/test.err</string>
 </dict>
 </plist>`
-	
+
 	err := os.WriteFile(plistPath, []byte(plistContent), 0644)
 	require.NoError(t, err)
 

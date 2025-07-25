@@ -17,7 +17,7 @@ func TestDict_AddString(t *testing.T) {
 	key, ok := dict.Items[0].(Key)
 	assert.True(t, ok)
 	assert.Equal(t, "TestKey", key.Value)
-	
+
 	str, ok := dict.Items[1].(String)
 	assert.True(t, ok)
 	assert.Equal(t, "TestValue", str.Value)
@@ -31,7 +31,7 @@ func TestDict_AddInteger(t *testing.T) {
 	key, ok := dict.Items[0].(Key)
 	assert.True(t, ok)
 	assert.Equal(t, "Count", key.Value)
-	
+
 	integer, ok := dict.Items[1].(Integer)
 	assert.True(t, ok)
 	assert.Equal(t, 42, integer.Value)
@@ -64,7 +64,7 @@ func TestDict_AddBool(t *testing.T) {
 			key, ok := dict.Items[0].(Key)
 			assert.True(t, ok)
 			assert.Equal(t, "BoolKey", key.Value)
-			
+
 			// Check type matches expected
 			assert.IsType(t, tt.want, dict.Items[1])
 		})
@@ -82,7 +82,7 @@ func TestDict_AddDict(t *testing.T) {
 	key, ok := parent.Items[0].(Key)
 	assert.True(t, ok)
 	assert.Equal(t, "SubDict", key.Value)
-	
+
 	subDict, ok := parent.Items[1].(*Dict)
 	assert.True(t, ok)
 	assert.Len(t, subDict.Items, 2)
@@ -97,11 +97,11 @@ func TestDict_AddStringArray(t *testing.T) {
 	key, ok := dict.Items[0].(Key)
 	assert.True(t, ok)
 	assert.Equal(t, "StringArray", key.Value)
-	
+
 	array, ok := dict.Items[1].(*Array)
 	assert.True(t, ok)
 	assert.Len(t, array.Items, 3)
-	
+
 	for i, item := range array.Items {
 		str, ok := item.(String)
 		assert.True(t, ok)
@@ -111,13 +111,13 @@ func TestDict_AddStringArray(t *testing.T) {
 
 func TestDict_AddDictArray(t *testing.T) {
 	parent := &Dict{}
-	
+
 	dict1 := &Dict{}
 	dict1.AddString("Key1", "Value1")
-	
+
 	dict2 := &Dict{}
 	dict2.AddString("Key2", "Value2")
-	
+
 	dicts := []*Dict{dict1, dict2}
 	parent.AddDictArray("DictArray", dicts)
 
@@ -125,7 +125,7 @@ func TestDict_AddDictArray(t *testing.T) {
 	key, ok := parent.Items[0].(Key)
 	assert.True(t, ok)
 	assert.Equal(t, "DictArray", key.Value)
-	
+
 	array, ok := parent.Items[1].(*Array)
 	assert.True(t, ok)
 	assert.Len(t, array.Items, 2)
@@ -219,7 +219,7 @@ func TestPlist_Validate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.plist.Validate()
-			
+
 			if tt.wantError {
 				assert.Error(t, err)
 				if tt.errorMsg != "" {
@@ -256,20 +256,20 @@ func TestPlist_MarshalXML(t *testing.T) {
 func TestNestedStructures(t *testing.T) {
 	// Test complex nested structure
 	root := &Dict{}
-	
+
 	// Add environment variables dict
 	envDict := &Dict{}
 	envDict.AddString("PATH", "/usr/local/bin:/usr/bin")
 	envDict.AddString("HOME", "/Users/test")
 	root.AddDict("EnvironmentVariables", envDict)
-	
+
 	// Add array of dicts
 	intervals := []*Dict{
 		{Items: []interface{}{Key{Value: "Hour"}, Integer{Value: 9}}},
 		{Items: []interface{}{Key{Value: "Hour"}, Integer{Value: 17}}},
 	}
 	root.AddDictArray("StartCalendarInterval", intervals)
-	
+
 	// Add string array
 	root.AddStringArray("ProgramArguments", []string{"/usr/bin/python", "script.py"})
 
@@ -278,13 +278,13 @@ func TestNestedStructures(t *testing.T) {
 	require.NoError(t, err)
 
 	xmlStr := string(data)
-	
+
 	// Verify nested structures
 	assert.Contains(t, xmlStr, "<key>EnvironmentVariables</key>")
 	assert.Contains(t, xmlStr, "<dict><key>PATH</key>")
 	assert.Contains(t, xmlStr, "<key>StartCalendarInterval</key>")
 	assert.Contains(t, xmlStr, "<array><dict>")
-	
+
 	// Count occurrences
 	assert.Equal(t, 2, strings.Count(xmlStr, "<key>Hour</key>"))
 }
@@ -292,7 +292,7 @@ func TestNestedStructures(t *testing.T) {
 func TestXMLIndentation(t *testing.T) {
 	dict := &Dict{}
 	dict.AddString("Label", "com.example.test")
-	
+
 	plist := &Plist{
 		Version: "1.0",
 		Dict:    dict,
@@ -302,7 +302,7 @@ func TestXMLIndentation(t *testing.T) {
 	var buf strings.Builder
 	encoder := xml.NewEncoder(&buf)
 	encoder.Indent("", "    ")
-	
+
 	err := encoder.Encode(plist)
 	require.NoError(t, err)
 

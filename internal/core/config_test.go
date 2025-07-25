@@ -50,7 +50,7 @@ func TestConfigPath(t *testing.T) {
 
 func TestDefaultConfig(t *testing.T) {
 	config := DefaultConfig()
-	
+
 	assert.Equal(t, "./daemons.yaml", config.DaemonConfigPath)
 	assert.Equal(t, "./daemons", config.DaemonsDir)
 	assert.Equal(t, "./out", config.OutputDir)
@@ -62,14 +62,14 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Equal(t, "console", config.LogFormat)
 	assert.False(t, config.UseSystemLaunchd)
 	assert.NotNil(t, config.CustomEnvVars)
-	
+
 	home, _ := os.UserHomeDir()
 	assert.Equal(t, filepath.Join(home, "Library", "LaunchAgents"), config.LaunchAgentsDir)
 }
 
 func TestNewManager(t *testing.T) {
 	manager := NewManager()
-	
+
 	assert.NotNil(t, manager)
 	assert.Equal(t, ConfigPath(), manager.configPath)
 	assert.NotNil(t, manager.viper)
@@ -118,22 +118,22 @@ daemon_config_path: /custom/path/daemons.yaml`
 		t.Run(tt.name, func(t *testing.T) {
 			// Create temp directory
 			tempDir := t.TempDir()
-			
+
 			// Create manager with custom config path
 			manager := &Manager{
 				configPath: filepath.Join(tempDir, "core.config.yaml"),
 				viper:      viper.New(),
 			}
-			
+
 			// Since ConfigDir is a function, we can't override it directly
 			// Instead, we'll use the manager with a custom config path
-			
+
 			if tt.setup != nil {
 				tt.setup(tempDir)
 			}
-			
+
 			err := manager.Init()
-			
+
 			if tt.wantError {
 				assert.Error(t, err)
 			} else {
@@ -175,20 +175,20 @@ func TestManager_Save(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
 			configPath := filepath.Join(tempDir, "core.config.yaml")
-			
+
 			manager := &Manager{
 				configPath: configPath,
 				viper:      viper.New(),
 			}
 			manager.viper.SetConfigFile(configPath)
 			manager.viper.SetConfigType("yaml")
-			
+
 			if tt.setup != nil {
 				tt.setup(manager)
 			}
-			
+
 			err := manager.Save()
-			
+
 			if tt.wantError {
 				assert.Error(t, err)
 			} else {
@@ -235,16 +235,16 @@ func TestManager_GetAndSet(t *testing.T) {
 			}
 			manager.viper.SetConfigFile(manager.configPath)
 			manager.viper.SetConfigType("yaml")
-			
+
 			// Set value if needed
 			if tt.setValue != nil {
 				err := manager.Set(tt.key, tt.setValue)
 				assert.NoError(t, err)
 			}
-			
+
 			// Get value
 			got, err := manager.Get(tt.key)
-			
+
 			if tt.wantError {
 				assert.Error(t, err)
 			} else {
@@ -287,7 +287,7 @@ func TestManager_GetDaemonConfigPath(t *testing.T) {
 			manager := &Manager{
 				config: tt.config,
 			}
-			
+
 			got := manager.GetDaemonConfigPath()
 			assert.Equal(t, tt.want, got)
 		})
@@ -296,7 +296,7 @@ func TestManager_GetDaemonConfigPath(t *testing.T) {
 
 func TestValidKeys(t *testing.T) {
 	keys := ValidKeys()
-	
+
 	expectedKeys := []string{
 		"daemon_config_path",
 		"daemons_dir",
@@ -311,39 +311,39 @@ func TestValidKeys(t *testing.T) {
 		"use_system_launchd",
 		"custom_env_vars",
 	}
-	
+
 	assert.ElementsMatch(t, expectedKeys, keys)
 }
 
 func TestManager_applyLogSettings(t *testing.T) {
 	tests := []struct {
-		name     string
-		logLevel string
+		name      string
+		logLevel  string
 		logFormat string
 	}{
 		{
-			name:     "applies debug level with json format",
-			logLevel: "debug",
+			name:      "applies debug level with json format",
+			logLevel:  "debug",
 			logFormat: "json",
 		},
 		{
-			name:     "applies info level with console format",
-			logLevel: "info",
+			name:      "applies info level with console format",
+			logLevel:  "info",
 			logFormat: "console",
 		},
 		{
-			name:     "applies warn level",
-			logLevel: "warn",
+			name:      "applies warn level",
+			logLevel:  "warn",
 			logFormat: "console",
 		},
 		{
-			name:     "applies error level",
-			logLevel: "error",
+			name:      "applies error level",
+			logLevel:  "error",
 			logFormat: "json",
 		},
 		{
-			name:     "defaults to info for invalid level",
-			logLevel: "invalid",
+			name:      "defaults to info for invalid level",
+			logLevel:  "invalid",
 			logFormat: "console",
 		},
 	}
@@ -356,7 +356,7 @@ func TestManager_applyLogSettings(t *testing.T) {
 					LogFormat: tt.logFormat,
 				},
 			}
-			
+
 			// This method sets global state, so we just verify it doesn't panic
 			assert.NotPanics(t, func() {
 				manager.applyLogSettings()
