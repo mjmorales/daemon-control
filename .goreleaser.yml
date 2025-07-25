@@ -125,29 +125,6 @@ release:
   prerelease: auto
   name_template: "{{.ProjectName}} v{{.Version}}"
 
-# Homebrew tap configuration
-brews:
-  - name: daemon-control
-    repository:
-      owner: mjmorales
-      name: homebrew-tap
-      branch: main
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    url_template: "https://github.com/mjmorales/daemon-control/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    download_strategy: CurlDownloadStrategy
-    commit_author:
-      name: goreleaserbot
-      email: goreleaser@mjmorales.com
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
-    homepage: "https://github.com/mjmorales/daemon-control"
-    description: "A generic daemon control tool for managing macOS LaunchAgent daemons"
-    license: "MIT"
-    skip_upload: auto
-    test: |
-      system "#{bin}/daemon-control", "--help"
-    install: |
-      bin.install "daemon-control"
-
 # SBOM generation
 sboms:
   - artifacts: archive

@@ -45,4 +45,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Core configuration management system
 - Editor integration for quick config editing
 - CI/CD with GitHub Actions, semantic-release, and goreleaser
-- Homebrew tap support
