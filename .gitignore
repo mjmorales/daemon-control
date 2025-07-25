@@ -53,3 +53,6 @@ daemon-control-*
 # History and Claude files
 .history
 .claude
+
+# Dependencies
+node_modules/

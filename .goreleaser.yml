@@ -1,0 +1,179 @@
+# .goreleaser.yml
+# Documentation: https://goreleaser.com/customization/
+
+project_name: daemon-control
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: daemon-control
+    main: ./main.go
+    binary: daemon-control
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser
+    # macOS specific build flags
+    overrides:
+      - goos: darwin
+        goarch: amd64
+        env:
+          - CC=o64-clang
+          - CXX=o64-clang++
+      - goos: darwin
+        goarch: arm64
+        env:
+          - CC=oa64-clang
+          - CXX=oa64-clang++
+
+archives:
+  - id: daemon-control
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+      - daemons.example.yaml
+      - docs/*
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+signs:
+  - artifacts: checksum
+    args:
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+    cmd: gpg
+    signature: "${artifact}.sig"
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^style:"
+      - "^refactor:"
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+  groups:
+    - title: "🚀 Features"
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: "🐛 Bug Fixes"
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 1
+    - title: "⚡ Performance Improvements"
+      regexp: "^.*perf[(\\w)]*:+.*$"
+      order: 2
+    - title: "🔨 Build System"
+      regexp: "^.*build[(\\w)]*:+.*$"
+      order: 3
+    - title: "👷 CI/CD"
+      regexp: "^.*ci[(\\w)]*:+.*$"
+      order: 4
+    - title: "📝 Documentation"
+      regexp: "^.*docs[(\\w)]*:+.*$"
+      order: 5
+    - title: "🧪 Tests"
+      regexp: "^.*test[(\\w)]*:+.*$"
+      order: 6
+    - title: "💄 Style"
+      regexp: "^.*style[(\\w)]*:+.*$"
+      order: 7
+    - title: "♻️ Refactoring"
+      regexp: "^.*refactor[(\\w)]*:+.*$"
+      order: 8
+    - title: "🔧 Configuration"
+      regexp: "^.*chore[(\\w)]*:+.*$"
+      order: 9
+    - title: "🌐 Internationalization"
+      regexp: "^.*i18n[(\\w)]*:+.*$"
+      order: 10
+    - title: "Others"
+      order: 999
+
+release:
+  github:
+    owner: mjmorales
+    name: mac-daemon-control
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  header: |
+    ## daemon-control v{{.Version}}
+    
+    macOS daemon management tool for LaunchAgents.
+
+# Homebrew tap configuration
+brews:
+  - name: daemon-control
+    tap:
+      owner: mjmorales
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    url_template: "https://github.com/mjmorales/mac-daemon-control/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    download_strategy: CurlDownloadStrategy
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@mjmorales.com
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    homepage: "https://github.com/mjmorales/mac-daemon-control"
+    description: "A generic daemon control tool for managing macOS LaunchAgent daemons"
+    license: "MIT"
+    skip_upload: auto
+    test: |
+      system "#{bin}/daemon-control", "--help"
+    install: |
+      bin.install "daemon-control"
+
+# Announce releases
+announce:
+  skip: "{{ gt .Patch 0 }}"
+  twitter:
+    enabled: false
+  discord:
+    enabled: false
+  slack:
+    enabled: false
+
+# SBOM generation
+sboms:
+  - artifacts: archive
+    args: ["$artifact", "--file", "${document}", "--output", "cyclonedx-json"]
+    cmd: syft
