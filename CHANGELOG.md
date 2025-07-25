@@ -1,3 +1,9 @@
+## [1.0.4](https://github.com/mjmorales/daemon-control/compare/v1.0.3...v1.0.4) (2025-07-25)
+
+### 🐛 Bug Fixes
+
+* add syft installation to release workflow for SBOM generation ([ed61f38](https://github.com/mjmorales/daemon-control/commit/ed61f38501b3603388e0f3cc971b316bb8b4ad9a))
+
 ## [1.0.3](https://github.com/mjmorales/daemon-control/compare/v1.0.2...v1.0.3) (2025-07-25)
 
 ### 🐛 Bug Fixes
