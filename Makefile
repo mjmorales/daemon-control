@@ -144,6 +144,12 @@ release: build-all
 	done
 	@echo "Release tarballs created in $(DIST_DIR)/releases/"
 
+# Generate plist files from config
+generate: build
+	@echo "Generating plist files..."
+	$(DIST_DIR)/$(BINARY_NAME) generate
+	@echo "Plist files generated"
+
 # Show help
 help:
 	@echo "Available targets:"
@@ -160,6 +166,7 @@ help:
 	@echo "  make deps         - Update dependencies"
 	@echo "  make deps-verify  - Verify dependencies"
 	@echo "  make run          - Build and run the application"
+	@echo "  make generate     - Generate plist files from config"
 	@echo "  make install      - Install binary to /usr/local/bin"
 	@echo "  make uninstall    - Remove binary from /usr/local/bin"
 	@echo "  make dev          - Run in development mode (requires air)"

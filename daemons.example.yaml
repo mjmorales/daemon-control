@@ -1,0 +1,136 @@
+# Example daemon configuration file
+# Copy this to daemons.yaml and modify for your needs
+
+daemons:
+  # Example 1: Simple Node.js application
+  - name: my-node-app
+    label: com.example.my-node-app
+    description: My Node.js Application
+    program_arguments:
+      - /usr/local/bin/node
+      - /path/to/app/index.js
+    working_directory: /path/to/app
+    environment_variables:
+      NODE_ENV: production
+      PORT: "3000"
+    standard_out_path: /var/log/my-node-app/stdout.log
+    standard_error_path: /var/log/my-node-app/stderr.log
+    run_at_load: true
+    keep_alive:
+      successful_exit: false
+      crashed: true
+    throttle_interval: 30
+
+  # Example 2: Python script with scheduling
+  - name: backup-script
+    label: com.example.backup-script
+    description: Daily backup script
+    program_arguments:
+      - /usr/bin/python3
+      - /path/to/backup.py
+    working_directory: /path/to/scripts
+    environment_variables:
+      BACKUP_DIR: /path/to/backups
+    standard_out_path: /var/log/backup/stdout.log
+    standard_error_path: /var/log/backup/stderr.log
+    # Run daily at 2:30 AM
+    start_calendar_interval:
+      - hour: 2
+        minute: 30
+
+  # Example 3: Web server with resource limits
+  - name: web-server
+    label: com.example.web-server
+    description: Custom web server
+    program: /usr/local/bin/webserver
+    working_directory: /var/www
+    environment_variables:
+      SERVER_ENV: production
+      CONFIG_FILE: /etc/webserver/config.yaml
+    standard_out_path: /var/log/webserver/access.log
+    standard_error_path: /var/log/webserver/error.log
+    run_at_load: true
+    keep_alive:
+      successful_exit: false
+      crashed: true
+      network_state: true
+    process_type: Adaptive
+    nice: 10
+    resource_limits:
+      number_of_files: 1024
+      number_of_processes: 64
+      resident_set_size: 536870912  # 512MB
+
+  # Example 4: Socket-activated service
+  - name: socket-service
+    label: com.example.socket-service
+    description: Socket-activated service
+    program_arguments:
+      - /usr/local/bin/socket-handler
+    sockets:
+      listeners:
+        sock_type: stream
+        sock_passive: true
+        sock_node_name: localhost
+        sock_service_name: "8080"
+        sock_family: IPv4
+        sock_protocol: TCP
+
+  # Example 5: File watcher
+  - name: file-watcher
+    label: com.example.file-watcher
+    description: Watch for file changes
+    program_arguments:
+      - /usr/local/bin/file-processor
+    watch_paths:
+      - /path/to/watch/directory
+    queue_paths:
+      - /path/to/queue/directory
+    enable_globbing: true
+    throttle_interval: 10
+
+  # Example 6: Multiple schedule intervals
+  - name: periodic-task
+    label: com.example.periodic-task
+    description: Task that runs multiple times per day
+    program: /usr/local/bin/periodic-task
+    start_calendar_interval:
+      # Run at 9 AM
+      - hour: 9
+        minute: 0
+      # Run at 1 PM
+      - hour: 13
+        minute: 0
+      # Run at 5 PM
+      - hour: 17
+        minute: 0
+      # Run every Monday at 10 AM
+      - weekday: 1
+        hour: 10
+        minute: 0
+
+  # Example 7: User-specific daemon
+  - name: user-daemon
+    label: com.example.user-daemon
+    description: Daemon running as specific user
+    program_arguments:
+      - /usr/local/bin/user-app
+    user_name: myuser
+    group_name: staff
+    init_groups: true
+    working_directory: /Users/myuser/app
+    environment_variables:
+      HOME: /Users/myuser
+      USER: myuser
+    run_at_load: false
+
+  # Example 8: Dependent service
+  - name: dependent-service
+    label: com.example.dependent-service
+    description: Service that depends on another
+    program: /usr/local/bin/dependent-app
+    keep_alive:
+      other_job_enabled:
+        com.example.web-server: true
+    enable_transactions: true
+    exit_timeout: 60
