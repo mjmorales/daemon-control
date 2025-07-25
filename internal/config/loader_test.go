@@ -222,7 +222,7 @@ func TestLoader_Load(t *testing.T) {
 			var configPath string
 			if tt.configData != "" {
 				configPath = filepath.Join(tempDir, tt.configPath)
-				err := os.WriteFile(configPath, []byte(tt.configData), 0644)
+				err := os.WriteFile(configPath, []byte(tt.configData), 0644) // #nosec G306 - test file
 				require.NoError(t, err)
 			}
 
@@ -266,7 +266,7 @@ func TestLoader_GetDaemon(t *testing.T) {
 
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "daemons.yaml")
-	err := os.WriteFile(configPath, []byte(configData), 0644)
+	err := os.WriteFile(configPath, []byte(configData), 0644) // #nosec G306 - test file
 	require.NoError(t, err)
 
 	loader := NewLoader(configPath)
@@ -347,7 +347,7 @@ func TestLoader_GetAllDaemons(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
 			configPath := filepath.Join(tempDir, "daemons.yaml")
-			err := os.WriteFile(configPath, []byte(tt.configData), 0644)
+			err := os.WriteFile(configPath, []byte(tt.configData), 0644) // #nosec G306 - test file
 			require.NoError(t, err)
 
 			loader := NewLoader(configPath)
@@ -375,7 +375,7 @@ func TestConfigExists(t *testing.T) {
 		{
 			name: "specific path exists",
 			setup: func(dir string) {
-				err := os.WriteFile(filepath.Join(dir, "custom.yaml"), []byte("test"), 0644)
+				err := os.WriteFile(filepath.Join(dir, "custom.yaml"), []byte("test"), 0644) // #nosec G306 - test file
 				require.NoError(t, err)
 			},
 			configPath: "custom.yaml",
@@ -390,7 +390,7 @@ func TestConfigExists(t *testing.T) {
 		{
 			name: "default location daemons.yaml",
 			setup: func(dir string) {
-				err := os.WriteFile(filepath.Join(dir, "daemons.yaml"), []byte("test"), 0644)
+				err := os.WriteFile(filepath.Join(dir, "daemons.yaml"), []byte("test"), 0644) // #nosec G306 - test file
 				require.NoError(t, err)
 			},
 			configPath: "",
@@ -399,7 +399,7 @@ func TestConfigExists(t *testing.T) {
 		{
 			name: "default location daemons.yml",
 			setup: func(dir string) {
-				err := os.WriteFile(filepath.Join(dir, "daemons.yml"), []byte("test"), 0644)
+				err := os.WriteFile(filepath.Join(dir, "daemons.yml"), []byte("test"), 0644) // #nosec G306 - test file
 				require.NoError(t, err)
 			},
 			configPath: "",
@@ -408,9 +408,9 @@ func TestConfigExists(t *testing.T) {
 		{
 			name: "default location config/daemons.yaml",
 			setup: func(dir string) {
-				err := os.MkdirAll(filepath.Join(dir, "config"), 0755)
+				err := os.MkdirAll(filepath.Join(dir, "config"), 0755) // #nosec G301 - test directory
 				require.NoError(t, err)
-				err = os.WriteFile(filepath.Join(dir, "config", "daemons.yaml"), []byte("test"), 0644)
+				err = os.WriteFile(filepath.Join(dir, "config", "daemons.yaml"), []byte("test"), 0644) // #nosec G306 - test file
 				require.NoError(t, err)
 			},
 			configPath: "",
@@ -562,4 +562,3 @@ func TestValidateCalendarInterval(t *testing.T) {
 func intPtr(i int) *int {
 	return &i
 }
-
