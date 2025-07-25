@@ -217,7 +217,7 @@ func TestLoader_Load(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create temp directory
 			tempDir := t.TempDir()
-			
+
 			// Create config file if data is provided
 			var configPath string
 			if tt.configData != "" {
@@ -225,20 +225,20 @@ func TestLoader_Load(t *testing.T) {
 				err := os.WriteFile(configPath, []byte(tt.configData), 0644)
 				require.NoError(t, err)
 			}
-			
+
 			// Change to temp directory to avoid picking up real config files
 			oldWd, err := os.Getwd()
 			require.NoError(t, err)
 			err = os.Chdir(tempDir)
 			require.NoError(t, err)
-			defer os.Chdir(oldWd)
-			
+			defer func() { _ = os.Chdir(oldWd) }()
+
 			// Create loader
 			loader := NewLoader(configPath)
-			
+
 			// Load config
 			cfg, err := loader.Load()
-			
+
 			if tt.wantError {
 				assert.Error(t, err)
 				if tt.errorMsg != "" {
@@ -263,21 +263,21 @@ func TestLoader_GetDaemon(t *testing.T) {
   - name: daemon2
     label: com.example.daemon2
     program: /usr/bin/daemon2`
-	
+
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "daemons.yaml")
 	err := os.WriteFile(configPath, []byte(configData), 0644)
 	require.NoError(t, err)
-	
+
 	loader := NewLoader(configPath)
 	_, err = loader.Load()
 	require.NoError(t, err)
-	
+
 	tests := []struct {
-		name      string
+		name       string
 		daemonName string
-		wantError bool
-		validate  func(*testing.T, *Daemon)
+		wantError  bool
+		validate   func(*testing.T, *Daemon)
 	}{
 		{
 			name:       "get existing daemon",
@@ -294,11 +294,11 @@ func TestLoader_GetDaemon(t *testing.T) {
 			wantError:  true,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			daemon, err := loader.GetDaemon(tt.daemonName)
-			
+
 			if tt.wantError {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), "daemon not found")
@@ -311,7 +311,7 @@ func TestLoader_GetDaemon(t *testing.T) {
 			}
 		})
 	}
-	
+
 	// Test with unloaded config
 	unloadedLoader := NewLoader("")
 	_, err = unloadedLoader.GetDaemon("any")
@@ -342,23 +342,23 @@ func TestLoader_GetAllDaemons(t *testing.T) {
 			wantCount:  0,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
 			configPath := filepath.Join(tempDir, "daemons.yaml")
 			err := os.WriteFile(configPath, []byte(tt.configData), 0644)
 			require.NoError(t, err)
-			
+
 			loader := NewLoader(configPath)
 			_, err = loader.Load()
 			require.NoError(t, err)
-			
+
 			daemons := loader.GetAllDaemons()
 			assert.Len(t, daemons, tt.wantCount)
 		})
 	}
-	
+
 	// Test with unloaded config
 	unloadedLoader := NewLoader("")
 	daemons := unloadedLoader.GetAllDaemons()
@@ -423,7 +423,7 @@ func TestConfigExists(t *testing.T) {
 			want:       false,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create temp directory and change to it
@@ -432,19 +432,19 @@ func TestConfigExists(t *testing.T) {
 			require.NoError(t, err)
 			err = os.Chdir(tempDir)
 			require.NoError(t, err)
-			defer os.Chdir(oldWd)
-			
+			defer func() { _ = os.Chdir(oldWd) }()
+
 			if tt.setup != nil {
 				tt.setup(tempDir)
 			}
-			
+
 			var got bool
 			if tt.configPath != "" {
 				got = ConfigExists(tt.configPath)
 			} else {
 				got = ConfigExists("")
 			}
-			
+
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -541,11 +541,11 @@ func TestValidateCalendarInterval(t *testing.T) {
 			wantError: false,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := validateCalendarInterval(tt.interval)
-			
+
 			if tt.wantError {
 				assert.Error(t, err)
 				if tt.errorMsg != "" {
@@ -562,3 +562,4 @@ func TestValidateCalendarInterval(t *testing.T) {
 func intPtr(i int) *int {
 	return &i
 }
+
