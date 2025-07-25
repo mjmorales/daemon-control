@@ -1,3 +1,9 @@
+## [1.0.6](https://github.com/mjmorales/daemon-control/compare/v1.0.5...v1.0.6) (2025-07-25)
+
+### 🐛 Bug Fixes
+
+* configure GPG for non-interactive signing in CI environment ([ecd004f](https://github.com/mjmorales/daemon-control/commit/ecd004f9bd33ffa2ad22c9dd7936e4defe5b0b2a))
+
 ## [1.0.5](https://github.com/mjmorales/daemon-control/compare/v1.0.4...v1.0.5) (2025-07-25)
 
 ### 🐛 Bug Fixes
