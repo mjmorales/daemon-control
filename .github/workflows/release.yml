@@ -87,9 +87,26 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
+          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
         run: |
+          echo "Configuring GPG for non-interactive mode..."
+          
+          # Create GPG home directory if it doesn't exist
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          
+          # Configure GPG for non-interactive operation
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          echo "default-cache-ttl 7200" >> ~/.gnupg/gpg-agent.conf
+          echo "max-cache-ttl 14400" >> ~/.gnupg/gpg-agent.conf
+          
+          # Restart gpg-agent with new configuration
+          gpg-connect-agent reloadagent /bye || true
+          
           echo "Importing GPG key..."
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import --passphrase "$GPG_PASSWORD" --pinentry-mode loopback
           
           # Verify the key was imported and matches the expected fingerprint
           gpg --list-secret-keys --keyid-format=long | grep -q "$GPG_FINGERPRINT" || {
@@ -97,7 +114,10 @@ jobs:
             exit 1
           }
           
-          echo "GPG key imported successfully"
+          # Trust the key
+          echo "$GPG_FINGERPRINT:6:" | gpg --import-ownertrust
+          
+          echo "GPG key imported and configured successfully"
 
       - name: Run GoReleaser
         if: steps.semantic.outputs.new_release == 'true'
@@ -109,6 +129,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
+          GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
       - name: Upload artifacts
         if: steps.semantic.outputs.new_release == 'true'
