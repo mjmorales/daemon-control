@@ -5,7 +5,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/mjmorales/mac-daemon-control.git"
+    "url": "https://github.com/mjmorales/daemon-control.git"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
@@ -20,6 +20,6 @@
     "semantic-release": "^24.0.0"
   },
   "release": {
-    "branches": ["main", "beta", "alpha"]
+    "branches": ["master", "beta", "alpha"]
   }
 }
